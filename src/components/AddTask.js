@@ -7,6 +7,7 @@ const AddTask = () => {
   const [list, setList] = useState({
     task: "",
   });
+  const BASE_URL = "https://amethyst-katydid-wig.cyclic.app"
 
   const [msg, setMsg] = useState("");
 
@@ -19,29 +20,36 @@ const AddTask = () => {
     w.preventDefault();
 
     await axios
-      .post("http://localhost:4000/add", { task: task })
+      .post(`${BASE_URL}/add`, { task: task })
       .then(() => {
-        
+       
         toast.success("task added");
+        setList({task:""})
         loadData()
       })
-      .catch(() => toast.error("task already added"));
-  };
+      .catch(() => {
+        if(task==""){
+          toast.error("please enter task")
+        }else{
+          toast.error("task already added")
+        }
+        });
+        };
 
   const [todo, setTodo] = useState([]);
   useEffect(() => {
     loadData();
   }, []);
   const loadData = async () => {
-    const result = await axios.get("http://localhost:4000/getall");
+    const result = await axios.get(`${BASE_URL}/getall`);
     setTodo(result.data);
   };
   
   const deleteTask=async(id)=>{
     
-    await axios.delete(`http://localhost:4000/delete/${id}`)
+    await axios.delete(`${BASE_URL}/delete/${id}`)
     .then(()=>{
-      console.log('deleted')
+      toast.warn('deleted')
       loadData()
     })
     .catch(()=>console.log('error'))
@@ -49,9 +57,9 @@ const AddTask = () => {
   }
   return (
     <div className="container">
-      <form action="" className="form-control my-5">
+    <ToastContainer className="text-start mx-5"/>
+      <form action="" autoComplete="off" className="form-control my-5">
         {msg}
-        <ToastContainer/>
         <h2 className="text-center">Todo</h2>
         <input
           type="text"
@@ -79,16 +87,20 @@ const AddTask = () => {
             </tr>
           </thead>
           <tbody>
-            {todo.map((x, id) => (
+            {todo.length>0 ?todo.map((x, id) => (
               <tr key={id}>
                 <td>{x.task}</td>
                 <td>{x.createdAt.substring(0,10)}</td>
                 <td className="text-center">
-                <Link className="btn btn-info" to={`/edit/${x._id}`}>Edit</Link>
-                <button  className="btn btn-danger mx-2" onClick={()=>deleteTask(x._id)}>Delete</button>
+                <Link className="btn btn-info rounded-5 py-2" to={`/edit/${x._id}`}>📝</Link>
+                <button  className="btn btn-danger rounded-5 py-2 mx-2" onClick={()=>deleteTask(x._id)}>🗑</button>
                 </td>
               </tr>
-            ))}
+            )) : 
+          (<div className="card p-3">
+            Make your first todo task
+            </div>)
+          }
           </tbody>
         </table>
     </div>

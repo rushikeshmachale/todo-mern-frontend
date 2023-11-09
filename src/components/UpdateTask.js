@@ -5,7 +5,7 @@ import { ToastContainer,toast } from "react-toastify";
 const UpdateTask = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const BASE_URL = "https://amethyst-katydid-wig.cyclic.app"
   const [list, setList] = useState([]);
   const [todo, setTodo] = useState({
     task: "",
@@ -23,7 +23,7 @@ const UpdateTask = () => {
   }, []);
 
   const loadData = async () => {
-    const res = await axios.get(`http://localhost:4000/get/${id}`);
+    const res = await axios.get(`${BASE_URL}/get/${id}`);
 
     setTodo(res.data);
   };
@@ -31,7 +31,7 @@ const UpdateTask = () => {
   const submit = async (e) => {
     e.preventDefault();
     await axios
-      .put(`http://localhost:4000/update/${id}`, todo)
+      .put(`${BASE_URL}/update/${id}`, todo)
       .then(() => {
         toast.success("updated");
         navigate("/");
